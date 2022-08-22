@@ -11,14 +11,6 @@ import { catchError, map, tap } from 'rxjs/operators';
 export class HeroService {
   private heroesUrl = 'api/heroes';  // URL to web api
 
-
-  getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
-      .pipe(
-        catchError(this.handleError<Hero[]>('getHeroes', []))
-      );
-  }
-
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
   
@@ -29,13 +21,21 @@ export class HeroService {
       return of(result as T);
     };
   }
-  
+
+  getHeroes(): Observable<Hero[]> {
+  return this.http.get<Hero[]>(this.heroesUrl)
+    .pipe(
+      tap(_ => this.log('fetched heroes')),
+      catchError(this.handleError<Hero[]>('getHeroes', []))
+    );
+}
 
 getHero(id: number): Observable<Hero> {
-
-  const hero = HEROES.find(h => h.id === id)!;
-  this.messageService.add(`HeroService: fetched hero id=${id}`);
-  return of(hero);
+  const url = `${this.heroesUrl}/${id}`;
+  return this.http.get<Hero>(url).pipe(
+    tap(_ => this.log(`fetched hero id=${id}`)),
+    catchError(this.handleError<Hero>(`getHero id=${id}`))
+  );
 }
 constructor(
   private http: HttpClient,
