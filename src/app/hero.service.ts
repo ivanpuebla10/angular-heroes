@@ -9,12 +9,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class HeroService {
   private heroesUrl = 'api/heroes';  // URL to web api
-  
-getHeroes(): Observable<Hero[]> {
-  const heroes = of(HEROES);
-  this.messageService.add('HeroService: fetched heroes');
-  return heroes;
+
+
+  getHeroes(): Observable<Hero[]> {
+  return this.http.get<Hero[]>(this.heroesUrl)
 }
+
 getHero(id: number): Observable<Hero> {
 
   const hero = HEROES.find(h => h.id === id)!;
